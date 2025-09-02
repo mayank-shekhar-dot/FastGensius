@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastGenius - AI Content Generation</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .loading-spinner {
+            display: none;
+        }
+        .result-card {
+            display: none;
+            margin-top: 20px;
+        }
+        .template-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .template-card:hover {
+            border-color: var(--bs-primary);
+        }
+        .template-card.active {
+            border-color: var(--bs-primary);
+            background-color: var(--bs-primary-bg-subtle);
+        }
+        .hero-section {
+            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-secondary) 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--bs-primary);
+        }
+        .content-display {
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-md-8">
+                    <h1 class="display-4 fw-bold mb-3">
+                        <i class="fas fa-bolt me-2"></i>FastGenius
+                    </h1>
+                    <p class="lead mb-4">
+                        AI-powered content generation in seconds. Create articles, replies, bios, explanations, and more with lightning speed.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <span class="badge bg-light text-dark px-3 py-2">⚡ Instant Generation</span>
+                        <span class="badge bg-light text-dark px-3 py-2">🌍 Multi-Language</span>
+                        <span class="badge bg-light text-dark px-3 py-2">📤 Export Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <!-- Template Selection -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-4">Choose Your Content Type</h2>
+                <div class="row" id="templateCards">
+                    <!-- Templates will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Form -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="contentForm">
+                            <div class="mb-3">
+                                <label for="topic" class="form-label">
+                                    <i class="fas fa-lightbulb me-2"></i>Topic/Question/Message
+                                </label>
+                                <textarea 
+                                    class="form-control" 
+                                    id="topic" 
+                                    rows="3" 
+                                    placeholder="Enter your topic, question, or message here..."
+                                    required
+                                ></textarea>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="contentType" class="form-label">Content Type</label>
+                                    <select class="form-select" id="contentType">
+                                        <option value="article">Article</option>
+                                        <option value="blog post">Blog Post</option>
+                                        <option value="product description">Product Description</option>
+                                        <option value="essay">Essay</option>
+                                        <option value="email">Email</option>
+                                        <option value="social media post">Social Media</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="tone" class="form-label">Tone</label>
+                                    <select class="form-select" id="tone">
+                                        <option value="professional">Professional</option>
+                                        <option value="friendly">Friendly</option>
+                                        <option value="casual">Casual</option>
+                                        <option value="formal">Formal</option>
+                                        <option value="enthusiastic">Enthusiastic</option>
+                                        <option value="apologetic">Apologetic</option>
+                                        <option value="persuasive">Persuasive</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="length" class="form-label">Length</label>
+                                    <select class="form-select" id="length">
+                                        <option value="short">Short</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="long">Long</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="language" class="form-label">Language</label>
+                                    <select class="form-select" id="language">
+                                        <option value="english">English</option>
+                                        <option value="spanish">Spanish</option>
+                                        <option value="hindi">Hindi</option>
+                                        <option value="french">French</option>
+                                        <option value="german">German</option>
+                                        <option value="italian">Italian</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-magic me-2"></i>Generate Content
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="clearForm()">
+                                    <i class="fas fa-eraser me-2"></i>Clear
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Loading Spinner -->
+                        <div class="loading-spinner text-center mt-3">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Generating...</span>
+                            </div>
+                            <p class="mt-2">Generating your content...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-info-circle me-2"></i>Quick Tips
+                        </h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Be specific with your topic for better results
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Choose the right tone for your audience
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Select appropriate length for your needs
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Export your content as text file
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card result-card" id="resultCard">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0" id="resultTitle">Generated Content</h5>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard()">
+                                    <i class="fas fa-copy me-1"></i>Copy
+                                </button>
+                                <button class="btn btn-sm btn-outline-success" onclick="exportContent()">
+                                    <i class="fas fa-download me-1"></i>Export
+                                </button>
+                            </div>
+                        </div>
+                        <div class="content-display" id="resultContent">
+                            <!-- Generated content will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentTemplate = 'quickwriter';
+        let generatedContent = null;
+
+        // Templates data
+        const templates = {
+            quickwriter: {
+                name: "📝 QuickWriter",
+                description: "Generate articles, blog posts, product descriptions, or essays",
+                icon: "fas fa-pen-fancy"
+            },
+            instant_replies: {
+                name: "💬 Instant Replies",
+                description: "Generate email/chat replies based on message tone",
+                icon: "fas fa-reply"
+            },
+            resume_bio: {
+                name: "📄 Resume/Job Bio",
+                description: "Generate personal bio or resume intro for job roles",
+                icon: "fas fa-user-tie"
+            },
+            eli5: {
+                name: "📚 Explain Like I'm 5",
+                description: "Explain any topic in a super simple way",
+                icon: "fas fa-child"
+            },
+            homework_helper: {
+                name: "🎓 Homework Helper",
+                description: "Get clean, short educational answers",
+                icon: "fas fa-graduation-cap"
+            },
+            startup_pitch: {
+                name: "🧪 Startup Pitch",
+                description: "Transform your idea into a 3-line elevator pitch",
+                icon: "fas fa-rocket"
+            },
+            custom_prompt: {
+                name: "🧩 Custom Prompt",
+                description: "Create your own prompt templates",
+                icon: "fas fa-cogs"
+            }
+        };
+
+        // Initialize templates
+        function initializeTemplates() {
+            const templateCards = document.getElementById('templateCards');
+            
+            Object.entries(templates).forEach(([key, template]) => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4 col-lg-3 mb-3';
+                card.innerHTML = `
+                    <div class="card template-card h-100" onclick="selectTemplate('${key}')">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="${template.icon}"></i>
+                            </div>
+                            <h6 class="card-title">${template.name}</h6>
+                            <p class="card-text small">${template.description}</p>
+                        </div>
+                    </div>
+                `;
+                templateCards.appendChild(card);
+            });
+            
+            // Select first template by default
+            selectTemplate('quickwriter');
+        }
+
+        // Select template
+        function selectTemplate(templateId) {
+            currentTemplate = templateId;
+            
+            // Update visual selection
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            const selectedCard = document.querySelector(`[onclick="selectTemplate('${templateId}')"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('active');
+            }
+            
+            // Update form based on template
+            updateFormForTemplate(templateId);
+        }
+
+        // Update form based on selected template
+        function updateFormForTemplate(templateId) {
+            const topicInput = document.getElementById('topic');
+            const contentTypeSelect = document.getElementById('contentType');
+            
+            switch(templateId) {
+                case 'instant_replies':
+                    topicInput.placeholder = "Enter the message you want to reply to...";
+                    contentTypeSelect.style.display = 'none';
+                    break;
+                case 'resume_bio':
+                    topicInput.placeholder = "Enter the job role or position...";
+                    contentTypeSelect.style.display = 'none';
+                    break;
+                case 'eli5':
+                    topicInput.placeholder = "Enter the topic you want explained simply...";
+                    contentTypeSelect.style.display = 'none';
+                    break;
+                case 'homework_helper':
+                    topicInput.placeholder = "Enter your homework question...";
+                    contentTypeSelect.style.display = 'none';
+                    break;
+                case 'startup_pitch':
+                    topicInput.placeholder = "Describe your app/business idea...";
+                    contentTypeSelect.style.display = 'none';
+                    break;
+                case 'custom_prompt':
+                    topicInput.placeholder = "Enter your custom prompt or request...";
+                    contentTypeSelect.style.display = 'none';
+                    break;
+                default:
+                    topicInput.placeholder = "Enter your topic, question, or message here...";
+                    contentTypeSelect.style.display = 'block';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('contentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const topic = document.getElementById('topic').value.trim();
+            if (!topic) {
+                alert('Please enter a topic');
+                return;
+            }
+            
+            const formData = {
+                template: currentTemplate,
+                topic: topic,
+                content_type: document.getElementById('contentType').value,
+                tone: document.getElementById('tone').value,
+                length: document.getElementById('length').value,
+                language: document.getElementById('language').value
+            };
+            
+            showLoading(true);
+            hideResult();
+            
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(data.result);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while generating content');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // Show/hide loading spinner
+        function showLoading(show) {
+            const spinner = document.querySelector('.loading-spinner');
+            spinner.style.display = show ? 'block' : 'none';
+        }
+
+        // Show result
+        function showResult(result) {
+            generatedContent = result;
+            document.getElementById('resultTitle').textContent = result.title;
+            document.getElementById('resultContent').textContent = result.content;
+            document.getElementById('resultCard').style.display = 'block';
+            
+            // Scroll to result
+            document.getElementById('resultCard').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // Hide result
+        function hideResult() {
+            document.getElementById('resultCard').style.display = 'none';
+        }
+
+        // Copy to clipboard
+        function copyToClipboard() {
+            if (!generatedContent) return;
+            
+            const text = `${generatedContent.title}\n\n${generatedContent.content}`;
+            navigator.clipboard.writeText(text).then(() => {
+                // Show success feedback
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-outline-primary');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-primary');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        // Export content
+        async function exportContent() {
+            if (!generatedContent) return;
+            
+            try {
+                const response = await fetch('/export', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: generatedContent.title,
+                        content: generatedContent.content
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${generatedContent.title.replace(/\s+/g, '_').toLowerCase()}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Failed to export content');
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Failed to export content');
+            }
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('contentForm').reset();
+            document.getElementById('topic').value = '';
+            hideResult();
+            generatedContent = null;
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTemplates();
+        });
+    </script>
+</body>
+</html>
